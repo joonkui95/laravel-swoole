@@ -3,6 +3,7 @@
 ![php-badge](https://img.shields.io/badge/php-%3E%3D%205.5.9-8892BF.svg)
 [![packagist-badge](https://img.shields.io/packagist/v/swooletw/laravel-swoole.svg)](https://packagist.org/packages/swooletw/laravel-swoole)
 [![Total Downloads](https://poser.pugx.org/swooletw/laravel-swoole/downloads)](https://packagist.org/packages/swooletw/laravel-swoole)
+[![travis-badge](https://api.travis-ci.org/swooletw/laravel-swoole.svg?branch=master)](https://travis-ci.org/swooletw/laravel-swoole)
 
 This package provides a high performance HTTP server to speed up your laravel/lumen application based on [Swoole](http://www.swoole.com/).
 
@@ -42,7 +43,7 @@ $app->register(SwooleTW\Http\LumenServiceProvider::class);
 
 ## Configuration
 
-If you want to change the default configurations, please run the following command to generate a configuration file `http.php` in directory `config/`:
+If you want to change the default configurations, please run the following command to generate a configuration file `swoole_http.php` in directory `config/`:
 
 ```
 $ php artisan vendor:publish
@@ -66,39 +67,44 @@ For example, if you want to set the 'max_request':
 ]
 ```
 
-## Command
+`providers`: The service providers you want to reset on every request. It will re-register and reboot those service providers before requesting every time.
+
+```php
+[
+    'providers' => [
+        App\Providers\AuthServiceProvider::class,
+    ]
+]
+```
+
+## Commands
 
 > The swoole_http_server can only run in cli environment, and this package provides convenient artisan commands to manage it.
 > By default, you can visit your site at http://127.0.0.1:1215
 
-Start the swoole_http_server:
+> `php artisan swoole:http {start|stop|restart|reload|infos|publish}`
 
-```
-$ php artisan swoole:http start
-```
-
-Stop the swoole_http_server:
-
-```
-$ php artisan swoole:http stop
-```
-
-Restart the swoole_http_server:
-
-```
-$ php artisan swoole:http restart
-```
-
-Reload the swoole_http_server:
-
-```
-$ php artisan swoole:http reload
-```
+| Command | Description |
+| --------- | --------- |
+| `start` | Start Laravel Swoole, list the processes by *ps aux&#124;grep swoole* |
+| `stop` | Stop Laravel Swoole |
+| `restart` | Restart Laravel Swoole |
+| `reload` | Reload all worker process(Contain your business & Laravel/Lumen codes), exclude master/manger process |
+| `infos` | Show PHP and Swoole basic miscs infos(including PHP version, Swoole version, Laravel version, server status and PID) |
+| `publish` | Publish configuration file `swoole_http.php` to `config` folder of your project |
 
 Now, you can run the following command to start the **swoole_http_server**.
 
 ```
 $ php artisan swoole:http start
+```
+
+## Get Swoole\Http\Server in your project
+
+```php
+// app('swoole.server') is a singleton instance
+$swoole = app('swoole.server');
+var_dump($swoole->stats());
 ```
 
 ## Nginx Configuration
